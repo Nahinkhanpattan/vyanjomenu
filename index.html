@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Menu Viewer</title>
+    <link rel="stylesheet" href="/src/index.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Weekly Menu Viewer</h1>
+        </header>
+
+        <div class="content">
+            <aside class="sidebar">
+                <form id="menuForm">
+                    <div class="form-group">
+                        <label for="diet">Diet Type:</label>
+                        <select id="diet" name="diet" required>
+                            <option value="VEG">Vegetarian</option>
+                            <option value="NON_VEG">Non-Vegetarian</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cuisine">Cuisine:</label>
+                        <select id="cuisine" name="cuisine" required>
+                            <option value="SOUTH_INDIAN">South Indian</option>
+                            <option value="NORTH_INDIAN">North Indian</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tier">Tier:</label>
+                        <select id="tier" name="tier" required>
+                            <option value="BASIC">Basic</option>
+                            <option value="REGULAR">Regular</option>
+                            <option value="PREMIUM">Premium</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Fetch Menu</button>
+                </form>
+            </aside>
+
+            <main class="main-content">
+                <div id="loading" class="loading" style="display: none;">
+                    Loading...
+                </div>
+
+                <div id="error" class="error" style="display: none;">
+                    <p id="errorMessage"></p>
+                </div>
+
+                <div id="menuContainer" class="menu-container" style="display: none;">
+                    <div id="menuInfo" class="menu-info"></div>
+                    <div id="menuItems" class="menu-items"></div>
+                </div>
+
+                <div id="noData" class="no-data">
+                    Select filters and click "Fetch Menu" to view the weekly menu
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
