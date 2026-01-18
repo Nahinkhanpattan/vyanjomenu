@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weekly Menu Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Inter, system-ui, -apple-system, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 16px 24px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    /* FORM */
+    .form-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    select,
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    /* MENU */
+    .menu {
+      display: grid;
+      gap: 20px;
+    }
+
+    .day-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .day-header {
+      padding: 14px 18px;
+      background: #eef2ff;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .meal-section {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .meal-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #374151;
+    }
+
+    .items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .item-chip {
+      padding: 6px 12px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .empty {
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  Weekly Menu Viewer
+</header>
+
+<div class="container">
+
+  <!-- FILTER FORM -->
+  <div class="form-card">
+    <div class="form-grid">
+
+      <div>
+        <label>Tier</label>
+        <select id="tier">
+          <option value="BASIC">Basic</option>
+          <option value="REGULAR" selected>Regular</option>
+          <option value="PREMIUM">Premium</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Cuisine</label>
+        <select id="cuisine">
+          <option value="SOUTH_INDIAN">South Indian</option>
+          <option value="NORTH_INDIAN">North Indian</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Diet</label>
+        <select id="diet">
+          <option value="VEG">Veg</option>
+          <option value="NON_VEG">Non-Veg</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Date</label>
+        <input type="date" id="date" value="2026-01-19" />
+      </div>
+
+      <div>
+        <button onclick="fetchMenu()">Fetch Menu</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MENU RESULT -->
+  <div id="menu" class="menu"></div>
+
+</div>
+
+<footer>
+  © Weekly Menu Viewer
+</footer>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+
+
+<script>
+  const dayNames = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ];
+
+async function fetchMenu() {
+  const tier = document.getElementById("tier").value;
+  const cuisine = document.getElementById("cuisine").value;
+  const diet = document.getElementById("diet").value;
+  const date = document.getElementById("date").value;
+  const token = document.getElementById("token").value.trim();
+
+  const url = `https://vyanjo-backend.onrender.com/api/menus/week?diet=${diet}&cuisine=${cuisine}&tier=${tier}&date=${date}`;
+
+  document.getElementById("menu").innerHTML =
+    "<div class='empty'>Loading menu...</div>";
+
+  const headers = {
+    "Content-Type": "application/json"
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  try {
+    const response = await fetch(url, { headers });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // ✅ CORRECT PATH BASED ON YOUR RESPONSE
+    const menu = data.data.menu;
+
+    renderMenu(menu);
+  } catch (error) {
+    document.getElementById("menu").innerHTML =
+      `<div class="empty">${error.message}</div>`;
+  }
+}
+
+  function renderMenu(menu) {
+    if (!menu || !menu.items || menu.items.length === 0) {
+      document.getElementById("menu").innerHTML =
+        "<div class='empty'>No menu found</div>";
+      return;
+    }
+
+    const grouped = {};
+
+    menu.items.forEach(item => {
+      const day = item.dayOfWeek;
+      const meal = item.mealType;
+
+      if (!grouped[day]) grouped[day] = {};
+      if (!grouped[day][meal]) grouped[day][meal] = [];
+
+      grouped[day][meal].push(item.itemName);
+    });
+
+    const container = document.getElementById("menu");
+    container.innerHTML = "";
+
+    Object.keys(grouped)
+      .sort((a, b) => a - b)
+      .forEach(day => {
+        const dayCard = document.createElement("div");
+        dayCard.className = "day-card";
+
+        dayCard.innerHTML = `
+          <div class="day-header">${dayNames[day - 1]}</div>
+        `;
+
+        Object.keys(grouped[day]).forEach(meal => {
+          const section = document.createElement("div");
+          section.className = "meal-section";
+
+          section.innerHTML = `
+            <div class="meal-title">${meal}</div>
+            <div class="items">
+              ${grouped[day][meal]
+                .map(item => `<span class="item-chip">${item}</span>`)
+                .join("")}
+            </div>
+          `;
+
+          dayCard.appendChild(section);
+        });
+
+        container.appendChild(dayCard);
+      });
+  }
+</script>
+
+</body>
+</html>
